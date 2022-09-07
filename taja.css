@@ -1,0 +1,30 @@
+.practice-section{
+    background-color:#F4EFEA;
+    border-radius:5px;
+    padding:5px;
+    margin:3px;
+}
+
+.practice-view{
+    padding: 10px;
+    margin: 0;
+}
+
+.practice-input{
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    font: 16px 'Malgun Gothic';
+    background-color: #8AAAE5;
+    color: #FEFEFE;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.practice-input.right{
+    background-color:green;
+}
+.practice-input.wrong{
+    background-color:rgb(244, 26, 26);
+}
