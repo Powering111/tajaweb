@@ -95,7 +95,44 @@ function view_page(){
         const processing_line = (viewing_page-1)*practice_count+i; //now processing line (absolute)
         const line = practice_lines[processing_line];
         if(typeof line !== "undefined"){
-            practice_view_elem[i].innerText = line;
+            practice_view_elem[i].innerHTML='';
+            const result = practice_line_results[processing_line] ?? '';
+            let d_s='y';
+            let d_str='';
+            let j=0;
+            const result_class_map = {'y':'right','n':'wrong'};
+            for(;j<result.length;j++){
+                if(d_s==result[j]){
+                    d_str+=line[j];
+                }
+                else{
+                    if(d_str.length>0){
+                        const elem = document.createElement('span');
+                        elem.classList.add(result_class_map[d_s]);
+                        elem.classList.add('display-text');
+                        elem.innerText=d_str;
+                        practice_view_elem[i].appendChild(elem);
+                    }
+                    d_str='';
+                    d_str+=line[j];
+                    d_s=result[j];
+                }
+            }
+            if(d_str.length>0){
+                const elem = document.createElement('span');
+                elem.classList.add(result_class_map[d_s]);
+                elem.classList.add('display-text');
+                elem.innerText=d_str;
+                practice_view_elem[i].appendChild(elem);
+            }
+            d_str='';
+            for(;j<line.length;j++){
+                d_str+=line[j];
+            }
+            const elem = document.createElement('span');
+            elem.classList.add('display-text');
+            elem.innerText=d_str;
+            practice_view_elem[i].appendChild(elem);
         }
         else{
             practice_view_elem[i].innerHTML = "&nbsp;";
@@ -116,19 +153,6 @@ function view_page(){
         else{
             practice_input_elem[i].disabled=true;
         }
-
-        if(practice_line_results[processing_line]=="RIGHT"){
-            practice_input_elem[i].classList.add('right');
-            practice_input_elem[i].classList.remove('wrong');
-        }
-        else if(practice_line_results[processing_line]=="WRONG"){
-            practice_input_elem[i].classList.remove('right');
-            practice_input_elem[i].classList.add('wrong');
-        }
-        else{
-            practice_input_elem[i].classList.remove('right');
-            practice_input_elem[i].classList.remove('wrong');
-        }
     }
 
     page_label_elem.innerText=viewing_page;
@@ -138,19 +162,23 @@ function process_input(force=false){
     if(!practicing) return;
     const inputText = practice_input_elem[now_line%practice_count].value;
     const realText = practice_lines[now_line];
-    practice_inputs[now_line]=inputText;
-    if(inputText.length>realText.length || (force && inputText.length==realText.length)){
-        if(inputText.trim()===realText){
-            console.log('right');
-            practice_line_results[now_line]="RIGHT";
-            next_line();
-        }
-        else{
-            console.log('wrong');
-            practice_line_results[now_line]="WRONG";
-            next_line();
+    practice_inputs[now_line]=inputText.substr(0,realText.length);
+    practice_line_results[now_line]='';
+    for(let i=0;i<inputText.length&&i<realText.length;i++){
+        if(realText[i]==inputText[i]){
+            practice_line_results[now_line]+='y';
+        } else{
+            practice_line_results[now_line]+='n';
         }
     }
+
+    if(force&&inputText.length>=realText.length){
+        next_line();
+    }
+    else if(inputText.length>realText.length){
+        next_line();
+    }
+    view_page();
 }
 
 function input_listener(event){
@@ -180,7 +208,7 @@ function view_now_page(){
 function view_prev_page(){
     viewing_page--;
     if(viewing_page<=0)viewing_page=0;
-    view_page(viewing_page);
+    view_page();
 }
 
 function next_line(){

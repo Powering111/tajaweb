@@ -22,6 +22,14 @@
     box-sizing: border-box;
 }
 
+.display-text.right{
+    color:blue;
+}
+.display-text.wrong{
+    color:red;
+}
+
+
 .practice-input.right{
     background-color:green;
 }
