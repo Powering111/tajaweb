@@ -22,7 +22,32 @@
         <div id="practice-container">
             
         </div>
-
+        <div id="time-container">
+            <div>
+                <span>경과 시간</span>
+                <span id="elapsed-time">0</span>
+            </div>
+            <div>
+                <span>글자수</span>
+                <progress id="character-count" min="0" max="1" value="0"></progress>
+                <label id="character-count-label">0</label>
+            </div>
+            <div>
+                <span>오타수</span>
+                <progress id="wrong-count" min="0" max="1" value="0"></progress>
+                <label id="wrong-count-label">0</label>
+            </div>
+            <div>
+                <span>타수</span>
+                <progress id="speed" value="0" max="1000" min="0"></progress>
+                <label id="speed-label">0</label>
+            </div>
+            <div>
+                <span>정확도</span>
+                <progress id="accuracy" value="0" max="100" min="0"></progress>
+                <label id="accuracy-label">100%</label>
+            </div>
+        </div>
     </div>
     <script src="content-list.js"></script>
     <script src="taja.js"></script>

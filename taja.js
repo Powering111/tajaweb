@@ -1,4 +1,3 @@
-
 const practice_select_elem = document.getElementById('practice-select');
 for(let content in content_list){
     const elem = document.createElement('option');
@@ -13,13 +12,28 @@ function start(){
     practice_start(selected_content.content);
 }
 
+function now(){
+    return new Date().getTime();
+}
+
+let start_time;
+let view_time_interval;
 const practice_count = 4;
 let practice_lines;
 const practice_container_elem = document.getElementById('practice-container');
+const elapsed_time_elem = document.getElementById('elapsed-time');
+const character_count_elem = document.getElementById('character-count');
+const character_count_label_elem = document.getElementById('character-count-label');
+const wrong_count_label_elem = document.getElementById('wrong-count-label');
+const speed_elem = document.getElementById('speed');
+const speed_label_elem = document.getElementById('speed-label');
+const accuracy_elem = document.getElementById('accuracy');
+const accuracy_label_elem = document.getElementById('accuracy-label');
+
 let practice_view_elem = [];
 let practice_input_elem = [];
 let practice_inputs = [];
-let practice_line_results = [];
+let practice_line_results = []; 
 const page_label_elem = document.getElementById('page-label');
 let now_page=1, now_line=1, viewing_page=1;
 let page_count;
@@ -56,6 +70,18 @@ function practice_start(content){
     page_count=Math.ceil(practice_lines.length/practice_count);
 
     practicing=true;
+    start_time = now();
+    
+    if(view_time_interval){
+        clearInterval(view_time_interval);
+    }
+    view_time_interval = setInterval(view_time,100);
+    let sumChars=0;
+    for(let line of practice_lines){
+        sumChars+=line.length;
+    }
+    character_count_elem.max=sumChars;
+
     view_page();
 }
 
@@ -88,9 +114,48 @@ function split_content(content, char_per_line=40){
     return result;
 }
 
+function view_time(){
+    //view time
+    const elapsedTime = now() - start_time;
+    elapsed_time_elem.innerText = `${Math.floor(elapsedTime/360000)}:${String("0"+Math.floor(elapsedTime/60000)).slice(-2)}:${String("0"+Math.floor(elapsedTime/1000)).slice(-2)}`;
+    let typedChars = 0, wrongChars=0;
+    for(let line of practice_line_results){
+        for(let i=0;i<line.length;i++){
+            if(line[i]=='y'){
+                typedChars++;
+            }
+            else if(line[i]=='n'){
+                wrongChars++;
+            }
+        }
+    }
+    character_count_elem.value=typedChars;
+    wrong_count_label_elem.innerText=wrongChars;
+    
+    character_count_label_elem.innerText=`${typedChars}/${character_count_elem.max}`;
+
+    let speed = 0;
+    if(typedChars){
+        speed = typedChars/(elapsedTime/60000);
+    }
+    speed_elem.value=speed;
+    speed_label_elem.innerText = `${speed}`;
+    let accuracy = 100;
+    if(typedChars+wrongChars>0){
+        accuracy=typedChars/(typedChars+wrongChars)*100;
+    }
+    accuracy_elem.value=accuracy;
+    accuracy_label_elem.innerText = `${accuracy}%`;
+
+
+}
 function view_page(){
     if(viewing_page<1) viewing_page=1;
     if(viewing_page>page_count) viewing_page=page_count;
+
+    view_time();
+
+    //view lines
     for(let i=0;i<practice_count;i++){
         const processing_line = (viewing_page-1)*practice_count+i; //now processing line (absolute)
         const line = practice_lines[processing_line];
@@ -155,6 +220,7 @@ function view_page(){
         }
     }
 
+    // page num
     page_label_elem.innerText=viewing_page;
 }
 
@@ -224,3 +290,4 @@ function next_line(){
     }
     view_page();
 }
+
