@@ -146,8 +146,6 @@ function process_input(force=false){
             next_line();
         }
         else{
-
-            }
             console.log('wrong');
             practice_line_results[now_line]="WRONG";
             next_line();
