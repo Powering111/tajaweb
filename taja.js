@@ -2,13 +2,23 @@ const practice_select_elem = document.getElementById('practice-select');
 for(let content in content_list){
     const elem = document.createElement('option');
     elem.value = content;
-    elem.innerText=content_list[content].author + " - " + content_list[content].title;
+    if(content_list[content].author?.length){
+        elem.innerText=content_list[content].author + " - " + content_list[content].title;
+    }
+    else{
+        elem.innerText=content_list[content].title;
+    }
     practice_select_elem.appendChild(elem);
 }
 
 function start(){
     const selected_content = content_list[practice_select_elem.value];
-    document.getElementById('title-label').innerText=selected_content.author + ' - ' + selected_content.title;
+    if(selected_content.author?.length){
+        document.getElementById('title-label').innerText=selected_content.author + " - " + selected_content.title;
+    }
+    else{
+        document.getElementById('title-label').innerText=selected_content.title;
+    }
     practice_start(selected_content.content);
 }
 
@@ -117,7 +127,7 @@ function split_content(content, char_per_line=40){
 function view_time(){
     //view time
     const elapsedTime = now() - start_time;
-    elapsed_time_elem.innerText = `${Math.floor(elapsedTime/360000)}:${String("0"+Math.floor(elapsedTime/60000)).slice(-2)}:${String("0"+Math.floor(elapsedTime/1000)).slice(-2)}`;
+    elapsed_time_elem.innerText = `${Math.floor(elapsedTime/360000)}:${String("0"+Math.floor(elapsedTime/60000)).slice(-2)}:${String("0"+Math.floor(elapsedTime/1000)%60).slice(-2)}`;
     let typedChars = 0, wrongChars=0;
     for(let line of practice_line_results){
         for(let i=0;i<line.length;i++){
@@ -221,7 +231,7 @@ function view_page(){
     }
 
     // page num
-    page_label_elem.innerText=viewing_page;
+    page_label_elem.innerText=`${viewing_page} / ${page_count}`;
 }
 
 function process_input(force=false){
@@ -234,7 +244,9 @@ function process_input(force=false){
         if(realText[i]==inputText[i]){
             practice_line_results[now_line]+='y';
         } else{
-            practice_line_results[now_line]+='n';
+            if(i!=inputText.length-1 || force){
+                practice_line_results[now_line]+='n';
+            }
         }
     }
 
@@ -280,8 +292,9 @@ function view_prev_page(){
 function next_line(){
     now_line++;
     if(now_line >= practice_lines.length){
-        alert("practice complete!");
+        clearInterval(view_time_interval);
         practicing=false;
+        alert("practice complete!");
     }
 
     if(now_line%practice_count==0){
